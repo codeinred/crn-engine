@@ -28,7 +28,11 @@ Additionally, you should ensure that the following **Individual Components** are
 - F# language support for web projects
 - Windows 10 SDK (10.0.17763.0)
 
-### 2. Install dotnet tools
+### 2. Install .NET SDKs
+
+The .NET Core SDKs required are [2.1](https://dotnet.microsoft.com/download/dotnet/2.1) and [3.1](https://dotnet.microsoft.com/download/dotnet/3.1). Currently, the build pipeline is working with 2.1.818 and 3.1.413.
+
+### 3. Install dotnet tools
 
 **dotnet tools** can be installed/restored by navigating to your repository directory and executing:
 
@@ -36,13 +40,13 @@ Additionally, you should ensure that the following **Individual Components** are
 
 This will install `paket` (package manager) and `fake` (library for simplifying .NET builds), which are used by the provided build pipeline.
 
-### 3. Restore dependencies
+### 4. Restore dependencies
 
 You can restore the dependencies associated with your favourite solution by simplying calling:
 
 `dotnet restore [path/to/solution]`
 
-### 4. Build solution
+### 5. Build solution
 
 In Visual Studio, you can select Build Solution from the BUILD menu (or issue the standard shortcut Ctrl+Alt+B). If any projects fail, try building again before attempting to diagnose the problem.
 
