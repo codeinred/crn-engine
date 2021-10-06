@@ -34,7 +34,7 @@ The .NET Core SDKs required are [2.1](https://dotnet.microsoft.com/download/dotn
 
 ### 3. Install dotnet tools
 
-**dotnet tools** can be installed/restored by navigating to your repository directory and executing:
+dotnet tools can be installed/restored by navigating to your repository directory and executing:
 
 `dotnet tool restore`
 
@@ -49,6 +49,12 @@ You can restore the dependencies associated with your favourite solution by simp
 ### 5. Build solution
 
 In Visual Studio, you can select Build Solution from the BUILD menu (or issue the standard shortcut Ctrl+Alt+B). If any projects fail, try building again before attempting to diagnose the problem.
+
+If you'd prefer not to open Visual Studio, you can run `msbuild` on the command-line. Simply add the directory containing msbuild (e.g. `C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin`) to your `PATH` environment variable. Then you can build as:
+
+`msbuild [path/to/solution]`
+
+Various switches can be added to `msbuild`, such as changing configuration (`/p:Configuration=Release`) and/or restoring dependencies (`/restore`).
 
 ## Contributions
 
