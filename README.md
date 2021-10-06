@@ -56,6 +56,14 @@ If you'd prefer not to open Visual Studio, you can run `msbuild` on the command-
 
 Various switches can be added to `msbuild`, such as changing configuration (`/p:Configuration=Release`) and/or restoring dependencies (`/restore`).
 
+### 6. Running examples
+
+Each program is run in different ways. 
+- **CLI tools**. After building, an .exe file will be in the corresponding `bin/x64/[Configuration]/netcoreapp3.1` folder. Each CLI tool has a different set of command-line arguments. Call `CliCRN.exe --help` for details. The basic idea is that a model file (`.crn`, `.gec` or `.dsd`) is supplied as the last argument, and different actions can be called (e.g. `--simulate`, `--infer [DATA-FOLDER]`).
+- **Server tools**. After building, an .exe file will be in the corresponding `bin/x64/[Configuration]/netcoreapp3.1` folder. Simply run the executable to bring up the GUI.
+- **HTML5-only tools**. In each of the HTML5 project folders (`CRNEngine\HTML5CRN`, `ClassicDSD\ClassicDSDHTML5`, `ClassicGEC\ClassicGECHTML5`), the `build.fsx` file describes the build targets, which includes a `run` action. This can be called as `dotnet fake build --target run` (this shortcut is in the `run.cmd` file). This will eventually open your default browser running the HTML5 GUI.
+
+
 ## Contributions
 
 There have been several contributors to this codebase, prior to its migration to this location on GitHub. Significant contributions have come from:
