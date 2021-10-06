@@ -1066,7 +1066,7 @@ NUGET
     FSharp.Control.Websockets (0.2.2)
       FSharp.Core (>= 4.3.4)
       Microsoft.IO.RecyclableMemoryStream (>= 1.2.2)
-    FSharp.Core (4.7) - redirects: force
+    FSharp.Core (4.7.2) - redirects: force
     FSharp.Data (3.3.3)
       FSharp.Core (>= 4.3.4)
     FSharp.Interop.Dynamic (4.0.3-beta95)
@@ -2227,7 +2227,7 @@ NUGET
       System.Reflection.TypeExtensions (>= 4.3)
       System.Runtime.Loader (>= 4.0)
       System.Security.Cryptography.Algorithms (>= 4.3)
-    FSharp.Core (4.7) - redirects: force
+    FSharp.Core (4.7.2) - redirects: force
     FSharp.Interop.Dynamic (4.0.3-beta95)
       Dynamitey (>= 2.0.6-beta111)
       FSharp.Core (>= 4.1.18)
