@@ -75,7 +75,11 @@ let simulate_crn_callback progress (crn:Crn) : simresult =
     try 
       let ode = crn.to_ode()
       Ode.simulate_sundials ode |> Float // TODO: Make a callback function so that we can pass in cancel and output
-    with | :? Errors.SimulatorErrorException -> crn.settings.parameters |> Parameters.to_string_inline |> failwithf "Sundials error: %s"
+    with 
+        | :? Errors.SimulatorErrorException -> 
+            crn.settings.parameters 
+            |> Parameters.to_string_inline 
+            |> failwithf "Sundials error: %s"
     #endif
   | Simulator.LNA -> 
     let result = ref []
