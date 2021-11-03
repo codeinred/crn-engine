@@ -218,7 +218,6 @@ let simulate_callback (cancel_flag:cancel) (output:Row<'a>->unit) (ode:t<'a>) =
 
   let simulate_event_worth (currenttime,nextprinttime, concs, stepsdone) (ev:event) =
     let eventtime = ev.time
-    let duration = eventtime - currenttime
     (* Actually run the simulator loop *)
     let (timeaftersimulation, concsaftersimilation, _) =
       (* Determine whether the first step will produce non-zero derivatives 
