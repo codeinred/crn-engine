@@ -203,12 +203,7 @@ type OdeSundials =
 
           //Switch to preallocation
           let data_chunk = storage |> Seq.map Array.ofSeq |> Array.ofSeq
-          let returned_times = 
-            match data_chunk.[0].Length with 
-            | inner_n -> inner_times 
-            | pre_n -> pre_times
-            | numtimes -> times
-            | _ -> failwith "Can't identify which times list to use in Sundials solver"
+          let returned_times = Array.sub times 0 data_chunk.[0].Length
           let rows = Table.from_array_columns (List.ofArray returned_times) data_chunk plots |> Table.to_rows
           (* Run callback output function on the storage *)
           output rows
@@ -226,7 +221,7 @@ type OdeSundials =
         raw_data := rows::!raw_data
     s.simulate_callback cancel output
     let plots:string list = List.map Functional2.to_string_plot s.simulator.settings.plots
-    Table.from_rows plots (List.concat !raw_data)
+    Table.from_rows plots (List.concat (List.rev !raw_data))
 
 /// The OdeSundials type is parameterized (by values) or instantiated from an environment
 [<JavaScript>]
