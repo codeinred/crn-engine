@@ -46,7 +46,18 @@ let process_mcmc (outDir:string) writeHtml (model:Model) (result:Inference.mcmc_
     let combineWrite tag =
         Result<_>.group_sweeps
         >> List.iter (fun (rs:Result<_> list) -> 
-            let combined_table = rs |> Seq.map (fun r -> r.table) |> List.ofSeq |> Table.concat
+            // ND: Cannot combine the table in general, because event times may differ. Do we really want to combine these tables?
+            //let combined_table = rs |> Seq.map (fun r -> r.table) |> List.ofSeq |> Table.concat
+            // As a workaround, we can identify the common time-points from the result tables and write those
+            let common_times = rs |> Seq.map (fun r -> Set.ofList r.table.times) |> Set.intersectMany
+            let combined_table = 
+                rs 
+                |> List.map (fun r -> 
+                    let indexed_times = List.filter (fun (i,t) -> Set.contains t common_times) (List.indexed r.table.times)
+                    let filtered_columns = r.table.columns |> List.map (fun col -> { col with values = List.map (fun (i,_) -> col.values.[i]) indexed_times})
+                    { times = List.map snd indexed_times; columns = filtered_columns }
+                )
+                |> Table.concat
             let instance = rs.Head.instance
             let fname = 
                 if instance.model = "" 
