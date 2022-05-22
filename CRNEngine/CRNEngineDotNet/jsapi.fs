@@ -171,10 +171,8 @@ let simulateFloat (ig : GuiIG) (node_id:string) (instance : Instance<string>) (o
     match crn.settings.simulator with
     | Simulator.Oslo -> crn.to_oslo().simulate_callback cancel output output_finals |> ignore
     | Simulator.SSA -> crn.to_ssa().simulate_callback cancel output output_finals (Some (fun _ _ _ -> ())) |> ignore // Note: if I use None here, W# compilation produces invalid code. Unable to create a simple repro.
-    | Simulator.Sundials ->
-        // Note: this will return all results at once when computation is done. In order to have progressive update, we need a Sundials simulator that takes a callback.
-        let result = crn.to_sundials().simulate()
-        Table.to_rows result |> List.iter output
+    // N.B. The Sundials solver produces chunks of output points, not individual time-points.
+    | Simulator.Sundials -> crn.to_sundials().simulate_callback cancel (List.iter output) |> ignore
     | _ -> failwithf "The %s simulator cannot be used here" crn.settings.simulator.to_string    
 
 type jit<'s> when 's : equality and 's:comparison =

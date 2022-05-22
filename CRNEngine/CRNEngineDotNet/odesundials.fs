@@ -18,7 +18,7 @@ type OdeSundials =
     concs: float []
   }
   /// Simulate an evaluated OdeSundials type.
-  member s.simulate () = 
+  member s.simulate_callback cancel output = 
     //We could have a separate create method as in the Oslo ode.
     let simulator = s.simulator
     let reactions = s.reactions
@@ -27,6 +27,7 @@ type OdeSundials =
     let pops = simulator.populations
     let starttime = sim_settings.initial
     let endtime = sim_settings.final
+    let plots:string list = List.map Functional2.to_string_plot sim_settings.plots
     let event_matters (ev:Event<Species, float, float>) = // RLP: These things are currently ensured by the simulator
       ev.time >= simulator.currenttime &&
       match ev.target with
@@ -38,10 +39,10 @@ type OdeSundials =
         let events = 
           simulator.events 
           |> List.filter event_matters (* Events sorted by time, evaluated by the environment *)
-          |> List.map (fun ev -> 
+          (*|> List.map (fun ev -> 
             match ev.target with 
             | Target.OutputPoint _ -> { ev with time = List.max sim_settings.times + 1.0 } 
-            | _ -> ev)  (* Reset Output time to last requested time-point *)
+            | _ -> ev)*)  (* Reset Output time to last requested time-point *)
         sim_settings.times, events
       else 
         let starttime = sim_settings.initial
@@ -118,14 +119,14 @@ type OdeSundials =
  #endif
     let functionRatesApplyerDelegate = new FunctionalRates(functionRatesApplyer)
 
-    //Preallocate the right sized array
-    //let storage = ref [||]
-    let storage : System.Collections.Generic.List<float>[] = 
-      Array.init numPrintSpecies (fun _ -> new System.Collections.Generic.List<float>())
     let printspecieslist = s.plots
     let specieslookup = Array.map Expression.to_lambda printspecieslist
-    let simulate_event_worth(currenttime, concs, stepsdone) (ev:Event<Species, float, float>) =  
+    let simulate_event_worth (currenttime, concs, stepsdone) (ev:Event<Species, float, float>) =  
+      (* Preallocate an array to store the results *)
+      let storage : System.Collections.Generic.List<float>[] = 
+        Array.init numPrintSpecies (fun _ -> new System.Collections.Generic.List<float>())
       let eventtime = ev.time
+      (* Create an array of times to pass to the solver *)
       match Array.tryFindIndex (fun t -> t >= currenttime) output_times with
       | None -> (currenttime, (concs:double []), stepsdone) (* Last event has stepped out of simulated interval *)
       | Some first_index ->
@@ -148,6 +149,7 @@ type OdeSundials =
             if (pre_times.[pre_n-1] < eventtime)
             then (Array.append pre_times [|eventtime|], pre_n + 1, true)
             else (pre_times, pre_n, false)                
+          
           (* we currently extract values as we go which saves intermediate memory but requires repeated lookups
              check this isn't costing us too much, we don't need intermediate results with this solver type *)
           #if JavaScript
@@ -160,22 +162,18 @@ type OdeSundials =
               There may be a better way to go about doing this. Colin *)
               //if (((not added_currenttime) || time <> currenttime) && ((not added_endtime) || time <> eventtime)) then
               if (((not added_currenttime) || time <> currenttime) && ((time = endtime && not added_endtime) || time <> eventtime)) then                  
-                  let rec keySolver k = 
-                    match k with 
-                    #if JavaScript
-                    | Inlined.Species i -> conc.[i]
-                    #else
-                    | Inlined.Species i -> conc_lookup i
-                    #endif
-                    | Inlined.Time      -> time
-                  //Row orientated approach
-                  //let outputdata = List.map (fun ip -> ip conc_lookup) specieslookup
-                  //outer_solution.Add(time :: outputdata)
-                  //Column orientated approach
-                  specieslookup 
-                    |> Array.iteri (fun index ip -> storage.[index].Add(ip.key keySolver))
+                let rec keySolver k = 
+                  match k with 
+                  #if JavaScript
+                  | Inlined.Species i -> conc.[i]
+                  #else
+                  | Inlined.Species i -> conc_lookup i
+                  #endif
+                  | Inlined.Time      -> time
+                // Iterate through species, adding to storage (column-orientated approach)
+                specieslookup |> Array.iteri (fun index ip -> storage.[index].Add(ip.key keySolver))
               ()          
-          let sundialsOutputDelegate = new SundialsOutput(sundialsOutput)      
+          let sundialsOutputDelegate = new SundialsOutput(sundialsOutput)
           // during this function, output() will be called back into          
           #if JavaScript
           // we need explicit return of "conc" here
@@ -186,6 +184,7 @@ type OdeSundials =
           #endif
             fnSundialsSolver(numSpecies, numReactionsM, stoichM, powersM, ratesMassAction, numReactionsF, stoichF,functionRatesApplyerDelegate, concs, times, numtimes, sundialsOutputDelegate, s.settings.stiff, s.settings.abstolerance, s.settings.reltolerance)          
           if sundialsOutputCode <> 0 then raise (Errors.SimulatorErrorException (sprintf "Sundials solver failed with code: %i" sundialsOutputCode))
+          
           (* Enact the event *)
           let concs =
               match ev.target with
@@ -200,14 +199,34 @@ type OdeSundials =
                       |> Map.ofList
                   let vals = Array.mapi (fun i x -> match Map.tryFind i pop_map with Some perturbation -> x + perturbation | None -> x) concs
                   vals
-              | _ -> concs      
+              | _ -> concs
+
+          //Switch to preallocation
+          let data_chunk = storage |> Seq.map Array.ofSeq |> Array.ofSeq
+          let returned_times = 
+            match data_chunk.[0].Length with 
+            | inner_n -> inner_times 
+            | pre_n -> pre_times
+            | numtimes -> times
+            | _ -> failwith "Can't identify which times list to use in Sundials solver"
+          let rows = Table.from_array_columns (List.ofArray returned_times) data_chunk plots |> Table.to_rows
+          (* Run callback output function on the storage *)
+          output rows
+
           (eventtime, concs, stepsdone + numtimes)
+
     (* Inside the event *)
-    let (endtime, concs, stepsdone) = List.fold simulate_event_worth (starttime, s.concs, 0) events
-    //Switch to preallocation
-    let raw_data = storage |> Seq.map Array.ofSeq |> Array.ofSeq
-    let plots:string list = List.map Functional2.to_string_plot sim_settings.plots
-    Table.from_array_columns times_list raw_data plots
+    List.fold simulate_event_worth (starttime, s.concs, 0) events |> ignore
+
+
+  member s.simulate () =
+    let cancel = ref false
+    let raw_data = ref []
+    let output (rows:Row<float> list) = 
+        raw_data := rows::!raw_data
+    s.simulate_callback cancel output
+    let plots:string list = List.map Functional2.to_string_plot s.simulator.settings.plots
+    Table.from_rows plots (List.concat !raw_data)
 
 /// The OdeSundials type is parameterized (by values) or instantiated from an environment
 [<JavaScript>]
