@@ -75,7 +75,11 @@ let simulate_crn_callback progress (crn:Crn) : simresult =
     try 
       let ode = crn.to_ode()
       Ode.simulate_sundials ode |> Float // TODO: Make a callback function so that we can pass in cancel and output
-    with | :? Errors.SimulatorErrorException -> crn.settings.parameters |> Parameters.to_string_inline |> failwithf "Sundials error: %s"
+    with 
+        | :? Errors.SimulatorErrorException -> 
+            crn.settings.parameters 
+            |> Parameters.to_string_inline 
+            |> failwithf "Sundials error: %s"
     #endif
   | Simulator.LNA -> 
     let result = ref []
@@ -149,7 +153,7 @@ let prepareSimulationDirectory outDir modelname sweep =
   Directory.CreateDirectory simDir |> ignore
   simDir
 
-let prepareFilenames settings instances = 
+let prepareFilenames settings (instances:Instance<Functional> list) = 
   let simulatorStr = 
     match settings.simulator with 
     | Simulator.PDE -> sprintf "pde%dd" settings.spatial.dimensions
@@ -157,12 +161,13 @@ let prepareFilenames settings instances =
   
   if (List.length instances) = 1
   then [ simulatorStr + ".tsv" ]
-  else 
+  else
     instances 
-    |> List.mapi (fun i instance -> 
-      if instance.environment.Count > 2
+    |> List.mapi (fun i instance ->
+      let fname = instance.name.TrimStart('[').TrimEnd(']')
+      if fname.Length > 100
       then sprintf "instance_%d.tsv" i
-      else env_to_string instance.environment + ".tsv"
+      else fname + ".tsv"
     )
 
 let write_multi outDir fileOptions settings (predictions:prediction list) = 

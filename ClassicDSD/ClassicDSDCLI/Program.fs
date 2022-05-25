@@ -26,6 +26,7 @@ let main args =
   let export_svg = dsd_results.Contains Svg
 
   let parser code : Microsoft.Research.CRNEngine.InferenceSiteGraph.IGraph = 
+    printfn "Compiling..."
     let crn = Dsd.compile code
 
     // DSD-specific actions on a compiled program
