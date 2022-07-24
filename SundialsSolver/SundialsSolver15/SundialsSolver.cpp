@@ -31,7 +31,7 @@
 #include <vector>
 #include <array>
 
-#ifdef NIX
+#if defined(__APPLE__) || defined(__unix__)
 #define ALLOCA alloca
 #else
 #define ALLOCA _alloca // CG: Not using _malloca as we want it to fail if it doesn't fit on the stack
