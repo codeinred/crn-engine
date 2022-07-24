@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/alecto/alecto/crn-engine/SundialsSolver/SundialsSolver15/SundialsSolver15.vcxproj": {}
+  },
+  "projects": {
+    "/home/alecto/alecto/crn-engine/SundialsSolver/SundialsSolver15/SundialsSolver15.vcxproj": {
+      "restore": {
+        "projectUniqueName": "/home/alecto/alecto/crn-engine/SundialsSolver/SundialsSolver15/SundialsSolver15.vcxproj",
+        "projectName": "SundialsSolver15",
+        "projectPath": "/home/alecto/alecto/crn-engine/SundialsSolver/SundialsSolver15/SundialsSolver15.vcxproj",
+        "projectJsonPath": "/home/alecto/alecto/crn-engine/SundialsSolver/SundialsSolver15/project.json",
+        "packagesPath": "/home/alecto/.nuget/packages/",
+        "projectStyle": "ProjectJson",
+        "validateRuntimeAssets": true,
+        "configFilePaths": [
+          "/home/alecto/.nuget/NuGet/NuGet.Config"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net40": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "dependencies": {
+        "GCCBuildTargets": "[1.*, )"
+      },
+      "frameworks": {
+        "net40": {}
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}
