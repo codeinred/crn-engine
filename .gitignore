@@ -436,3 +436,5 @@ CRNEngine/CRNEngineDotNet/version.txt
 
 # Paket
 .paket/
+cvode-build/
+cvode-package/
