@@ -15,10 +15,9 @@
 #else
 #define SUNDIALSSOLVER_API __declspec(dllimport)
 #endif
-#elif defined(_GCC)
+#elif defined(__GNUG__)
 //  GCC
 #define SUNDIALSSOLVER_API __attribute__((visibility("default")))
-#define SUNDIALSSOLVER_API
 #else
 // unkown compiler, do nothing?
 #define SUNDIALSSOLVER_API
