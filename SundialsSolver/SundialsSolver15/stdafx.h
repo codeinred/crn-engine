@@ -10,7 +10,7 @@
 
 #ifndef  __EMSCRIPTEN__
 
-#ifndef NIX
+#if defined(_WIN32)
 
 #include "targetver.h"
 
