@@ -5,8 +5,6 @@ dotnet tool restore
 # Download dependencies
 dotnet paket restore
 
-# xbuild tool needed 
-# Install with: pacman -S extra/mono
 
 env VCTargetsPath=./ dotnet build
 # Install GCC Build Template for using C++ with dotnet on linux
