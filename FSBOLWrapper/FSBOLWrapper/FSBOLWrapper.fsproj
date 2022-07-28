@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="helper.fs" />
-    <Compile Include="gecHelper.fs" />
+    <Compile Include="GECHelper.fs" />
     <Compile Include="AssemblyInfo.fs" />
     <None Include="paket.references" />
     <Content Include="app.config" />

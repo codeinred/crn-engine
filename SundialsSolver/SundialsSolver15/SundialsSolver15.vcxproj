@@ -19,17 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCTargetsPath Condition="'$(DesignTimeBuild)'!='true' AND ($(Configuration.Contains('Linux')) OR $(Platform.Contains('Linux')))">./</VCTargetsPath>
-    <MSBuildProjectExtensionsPath Condition="'$(DesignTimeBuild)'!='true' AND ($(Configuration.Contains('Linux')) OR $(Platform.Contains('Linux')))">./</MSBuildProjectExtensionsPath>
+    <OnWindows Condition="$(Configuration.Contains('Win'))">true</OnWindows>
+    <OnWindows Condition="!$(Configuration.Contains('Win'))">false</OnWindows>
+    <OnUnix Condition="!$(Configuration.Contains('Win'))">true</OnUnix>
+    <OnUnix Condition="$(Configuration.Contains('Win'))">false</OnUnix>
+    <VCTargetsPath Condition="$(OnUnix)">.</VCTargetsPath>
+    <MSBuildProjectExtensionsPath Condition="$(OnUnix)">./</MSBuildProjectExtensionsPath>
     <GCCBuild_UseWSL>false</GCCBuild_UseWSL>
     <GCCToolCompilerStyle Condition="$(Configuration.Contains('Wasm'))">llvm</GCCToolCompilerStyle>
-
-    <VCTargetsPath Condition="'$(DesignTimeBuild)'!='true' AND $(Configuration.Contains('Wasm'))">./</VCTargetsPath>
-    <MSBuildProjectExtensionsPath Condition="'$(DesignTimeBuild)'!='true' AND $(Configuration.Contains('Wasm'))">./</MSBuildProjectExtensionsPath>
-
-    <VCTargetsPath Condition="'$(DesignTimeBuild)'!='true' AND ($(Configuration.Contains('GCC')) OR $(Platform.Contains('GCC')))">./</VCTargetsPath>
-    <MSBuildProjectExtensionsPath Condition="'$(DesignTimeBuild)'!='true' AND ($(Configuration.Contains('GCC')) OR $(Platform.Contains('GCC')))">./</MSBuildProjectExtensionsPath>
-
+  
     <ProjectGuid>{866880DC-BF1E-4C12-8238-72E7EFF44AFB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SundialsSolver15</RootNamespace>
@@ -120,7 +118,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
-    <Link>
+    <Link Condition="'$(OnWindows)'">
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\Lib\Sundials_v3.1.2_64bit_VS2019\RelWithDebInfo\lib\</AdditionalLibraryDirectories>

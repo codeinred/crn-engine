@@ -30,7 +30,7 @@
     <Compile Include="hypothesis.fs" />
     <Compile Include="program.fs" />
     <Compile Include="main.fs" />
-    <Compile Include="transCrn.fs" />
+    <Compile Include="TransCrn.fs" />
     <Compile Include="gec.fs" />
     <Compile Include="Databases.fs" />
     <Compile Include="jsapi.fs" />
